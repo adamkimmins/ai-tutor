@@ -17,7 +17,7 @@ class TutorProfile:
     name: str
     subject: str
     system_prompt: str
-    language: str                        # whisper language code e.g. "it", "en"
+    language: str = "en"                     # whisper language code e.g. "it", "en"
     notes: str = ""
     tts_engine: str = "f5"              # "f5" | "kokoro" | "piper"
     tts_voice: str = ""                 # engine-specific voice identifier
