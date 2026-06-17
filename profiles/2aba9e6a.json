@@ -1,0 +1,15 @@
+{
+  "name": "it",
+  "subject": "italian",
+  "system_prompt": "speak ony in italian",
+  "language": "it",
+  "tts_engine": "f5",
+  "tts_voice": "",
+  "tts_ref_audio": "",
+  "llm_provider": "ollama",
+  "llm_model": "gemma3:4b",
+  "llm_url": "http://localhost:11434",
+  "llm_api_key": "",
+  "context_files": [],
+  "id": "2aba9e6a"
+}
