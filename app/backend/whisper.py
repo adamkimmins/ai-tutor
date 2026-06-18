@@ -1,6 +1,6 @@
 import subprocess
 import os
-from config import WHISPER_BIN, WHISPER_MODEL, WHISPER_LANGUAGES
+from config import WHISPER_BIN, WHISPER_MODEL, WHISPER_LANGUAGES, DEFAULT_LANGUAGE
 
 
 def transcribe(wav_path: str) -> str:
@@ -12,7 +12,7 @@ def transcribe(wav_path: str) -> str:
         WHISPER_BIN,
         "-m", WHISPER_MODEL,
         "-f", wav_path,
-        "-l", WHISPER_LANGUAGES,
+        "-l", DEFAULT_LANGUAGE,
         "--no-timestamps",
     ]
 

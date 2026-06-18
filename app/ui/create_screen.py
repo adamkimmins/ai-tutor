@@ -134,10 +134,9 @@ class CreateScreen(QWidget):
         )
         layout.addWidget(self.prompt_field)
 
-        # ── LLM ──
        # ── LLM ──
         layout.addWidget(self._divider())
-        layout.addWidget(self._label("OLLAMA MODEL"))
+        # layout.addWidget(self._label("OLLAMA MODEL"))
         self.model_field = QLineEdit()
         self.model_field.setPlaceholderText("e.g. gemma3:4b, llama3.2:3b, qwen3:8b")
         layout.addWidget(self.model_field)

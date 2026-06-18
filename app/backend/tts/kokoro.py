@@ -19,8 +19,15 @@ class KokoroBackend(TTSBackend):
             from kokoro import KPipeline
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                _pipeline = KPipeline(lang_code=self.profile.language or 'it',
+                WHISPER_TO_KOKORO = {
+                    'en': 'a', 'it': 'i', 'fr': 'f', 'es': 'e',
+                    'hi': 'h', 'pt': 'p', 'ja': 'j', 'zh': 'z', 'b': 'b',
+                }
+                lang = WHISPER_TO_KOKORO.get(self.profile.language or 'it', 'a')
+                _pipeline = KPipeline(lang_code=lang,
                                       repo_id='hexgrad/Kokoro-82M')
+                # _pipeline = KPipeline(lang_code=self.profile.language or 'it',
+                                    #   repo_id='hexgrad/Kokoro-82M')
             print("[kokoro] Ready.")
 
     def speak_stream(self, token_iterator, interrupt_event) -> bool:

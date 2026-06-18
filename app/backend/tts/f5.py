@@ -22,9 +22,15 @@ class F5Backend(TTSBackend):
     def load(self):
         if self._tts is None:
             print("[f5-tts] Loading model...")
-            from f5_tts.api import F5TTS
-            self._tts = F5TTS()
-            print("[f5-tts] Ready.")
+            try:
+                from f5_tts.api import F5TTS
+                self._tts = F5TTS()
+                print("[f5-tts] Ready.")
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(f"[f5-tts] FAILED to load: {e}")
+                self._tts = None
 
     def _synthesize(self, text: str) -> np.ndarray | None:
         if not text.strip():
@@ -85,28 +91,74 @@ class F5Backend(TTSBackend):
             sentence = sentence.strip()
             if not sentence:
                 return False
-            audio = self._synthesize(sentence)
-            if audio is not None:
-                return self._play(audio, interrupt_event)
+            try:
+                audio = self._synthesize(sentence)
+                if audio is not None:
+                    return self._play(audio, interrupt_event)
+            except Exception as e:
+                print(f"[f5-tts] flush error: {e}")
+                import traceback; traceback.print_exc()
             return False
 
-        with self._lock:
-            for token in token_iterator:
-                if interrupt_event.is_set():
-                    interrupted = True
-                    break
-                buffer += token
-                parts   = sent_end.split(buffer)
-                if len(parts) > 1:
-                    for s in parts[:-1]:
-                        if flush(s):
-                            interrupted = True
-                            break
-                    if interrupted:
+        try:
+            with self._lock:
+                for token in token_iterator:
+                    if interrupt_event.is_set():
+                        interrupted = True
                         break
-                    buffer = parts[-1]
+                    buffer += token
+                    parts   = sent_end.split(buffer)
+                    if len(parts) > 1:
+                        for s in parts[:-1]:
+                            if flush(s):
+                                interrupted = True
+                                break
+                        if interrupted:
+                            break
+                        buffer = parts[-1]
 
-            if not interrupted and buffer.strip():
-                flush(buffer)
+                if not interrupted and buffer.strip():
+                    flush(buffer)
+        except Exception as e:
+            print(f"[f5-tts] speak_stream error: {e}")
+            import traceback; traceback.print_exc()
 
         return interrupted
+    # def speak_stream(self, token_iterator, interrupt_event) -> bool:
+    #     self.load()
+    #     if self._tts is None:
+    #         print("[f5-tts] Skipping, model not loaded")
+    #         return False
+    #     buffer   = ""
+    #     sent_end = re.compile(r'(?<=[.!?])\s+')
+    #     interrupted = False
+
+    #     def flush(sentence: str) -> bool:
+    #         sentence = sentence.strip()
+    #         if not sentence:
+    #             return False
+    #         audio = self._synthesize(sentence)
+    #         if audio is not None:
+    #             return self._play(audio, interrupt_event)
+    #         return False
+
+    #     with self._lock:
+    #         for token in token_iterator:
+    #             if interrupt_event.is_set():
+    #                 interrupted = True
+    #                 break
+    #             buffer += token
+    #             parts   = sent_end.split(buffer)
+    #             if len(parts) > 1:
+    #                 for s in parts[:-1]:
+    #                     if flush(s):
+    #                         interrupted = True
+    #                         break
+    #                 if interrupted:
+    #                     break
+    #                 buffer = parts[-1]
+
+    #         if not interrupted and buffer.strip():
+    #             flush(buffer)
+
+    #     return interrupted

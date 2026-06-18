@@ -118,15 +118,12 @@ def activate_profile(profile: TutorProfile):
 
     threading.Thread(target=load, daemon=True).start()
 
-
 def start_mic(session):
     global listener
     from app.backend.listener import Listener
     listener = Listener(on_speech_ready=on_speech)
     listener.start()
     session.connect_mic_toggle(on_mic_toggle)
-    set_state("listening")
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
